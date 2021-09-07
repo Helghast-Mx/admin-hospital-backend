@@ -14,6 +14,9 @@ const app = express();
     //el use es un middleweb que indica que cada que pase por aqui se ejecutara de este punto hacia abajo
 app.use( cors() )
 
+// Lectura y parseo del body
+app.use( express.json( ) );
+
 // Base de datos
 dbConnection()
 
@@ -22,12 +25,17 @@ dbConnection()
 // console.log( process.env );
 
 // Rutas
-app.get( '/', (req, resp) =>{
-    resp.status(400).json({
-        ok: true,
-        msg: 'Hola mundo'
-    })
-} )
+// todo lo que pase por esta ruta
+                    // sera respondido por este archivo
+app.use( '/api/usuarios', require('./routes/usuarios.routes') )
+app.use( '/api/login', require('./routes/auth.routes') )
+
+// app.get( '/api/usuarios', (req, resp) =>{
+//     resp.status(200).json({
+//         ok: true,
+//         msg: 'Hola mundo'
+//     })
+// } )
 
 // Para levantar el servidor
 app.listen(process.env.PORT, () => {
