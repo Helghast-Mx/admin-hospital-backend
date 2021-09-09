@@ -7,11 +7,26 @@ const Usuario = require('../models/usuario.model')
 
 
 const getUsuarios = async (req, resp) =>{
-                            // asi especificamos un filtro
-    const usuarios = await Usuario.find({}, 'nombre email password')
+
+    // paginacion
+    const desde = Number( req.query.desde ) || 0
+    console.log(desde);
+
+
+    const [usuarios, total] = await Promise.all([
+        // ejecuta todas estas promesas
+        // primera posicion del arreglo
+        Usuario.find({}, 'nombre email password')
+                .skip(desde)
+                .limit( 5 ), 
+        // segunda posicion del arreglo
+        Usuario.count()
+    ])
+
     resp.status(200).json({
         ok: true,
-        usuarios
+        usuarios,
+        total
     })
 }
 
