@@ -16,11 +16,11 @@ const getUsuarios = async (req, resp) =>{
     const [usuarios, total] = await Promise.all([
         // ejecuta todas estas promesas
         // primera posicion del arreglo
-        Usuario.find({}, 'nombre email password')
+        Usuario.find({}, 'nombre email role google img')
                 .skip(desde)
                 .limit( 5 ), 
         // segunda posicion del arreglo
-        Usuario.count()
+        Usuario.countDocuments()
     ])
 
     resp.status(200).json({
