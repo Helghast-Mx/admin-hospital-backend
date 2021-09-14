@@ -3,14 +3,13 @@ const { generarJWT } = require('../helpers/jwt')
 
 const bcryptj = require('bcryptjs')
 const Usuario = require('../models/usuario.model')
+const { googleVerify } = require('../helpers/google-verify')
 
 const login = async ( req, resp = response ) => {
 
     const { email, password } = req.body
 
     try {
-
-
         // verificar si viene un email
         const usuarioDB = await Usuario.findOne({ email });
         if(!usuarioDB) {
@@ -51,6 +50,58 @@ const login = async ( req, resp = response ) => {
 
 }
 
+const googleSignUp = async ( req, resp = response ) => {
+
+    // reciviendo el token del body de la peticion
+    const googleToken = req.body.token
+    console.log(googleToken);
+
+    try {
+
+        const { name, email, picture } = await googleVerify( googleToken )
+        
+        // verificar si existe un usuario en la bd con ese email
+        const usuarioDB = await Usuario.findOne({email});
+
+        // si el usuario no existe, creamos uno nuevo
+        let usuario;
+        if( !usuarioDB ){
+            usuario= new Usuario ( {
+                nombre: name,
+                email,
+                password:'@@@',
+                img: picture,
+                google : true
+            })
+        } else {
+            // si existe el usuario
+            usuario = usuarioDB;
+            usuario.google = true;
+            usuario.password = '@@@'
+
+        }
+
+        // guardar en BD
+        await  usuario.save();
+
+        const token = await generarJWT( usuario.id )
+
+        resp.json({
+            ok: true,
+            token
+        })
+
+    } catch (error) {
+        resp.status(400).json({
+            ok: false,
+            msg: 'token no es correcto'
+        })
+    }
+
+    
+}
+
 module.exports = {
-    login
+    login,
+    googleSignUp
 }

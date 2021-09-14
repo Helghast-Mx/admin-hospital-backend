@@ -20,6 +20,9 @@ app.use( express.json( ) );
 // Base de datos
 dbConnection()
 
+// directorio publico
+app.use( express.static('public') );
+
 // mean_user
 // WwSRIa5110KAmWoE
 // console.log( process.env );
