@@ -38,18 +38,80 @@ const crearHospital = async (req, resp = response) => {
     
 }
 
-const actualizarHospital = (req, resp = response) => {
-    resp.json({
-        ok:true, 
-        msg: 'actualizarHospital'
-    })
+const actualizarHospital = async(req, resp = response) => {
+
+    const hospitalID = req.params.id;
+    const uidUsuario = req.uid
+
+    try {
+        // vemos si existe un hospital con ese id
+         const hospitalDB = await Hospital.findById( hospitalID )
+
+        if( !hospitalDB ){
+            
+            resp.status(400).json({
+                ok: false, 
+                msg: 'hospital no encontrado por id',
+            })
+        }
+        
+        // actualizar hospital
+        //hospitalDB.nombre = req.body.nombre //esta es una manera 
+        const cambiosHospital = {
+            ...req.body,
+            usuario : uidUsuario
+        }
+
+        const hospitalActualizado = await Hospital.findByIdAndUpdate( hospitalDB, cambiosHospital, { new:true } )
+
+        resp.status(200).json({
+            ok: true, 
+            msg: 'Hospital Actualizado',
+            hospital: hospitalActualizado
+        })
+
+    } catch (error) {
+        console.log(error);
+        resp.status(400).json({
+            ok: false,
+            msg: 'no se pudo actualizar el hospital'
+        })
+    }
+
 }
 
-const borrarHospital = (req, resp = response) => {
-    resp.json({
-        ok:true, 
-        msg: 'borrarHospital'
-    })
+const borrarHospital = async (req, resp = response) => {
+
+    const hospitalID = req.params.id;
+
+    try {
+        // vemos si existe un hospital con ese id
+         const hospitalDB = await Hospital.findById( hospitalID )
+
+        if( !hospitalDB ){
+            
+            resp.status(400).json({
+                ok: false, 
+                msg: 'hospital no encontrado por id',
+            })
+        }
+        
+       await Hospital.findByIdAndDelete( hospitalDB )
+
+        // const hospitalActualizado = await Hospital.findByIdAndUpdate( hospitalDB, cambiosHospital, { new:true } )
+
+        resp.status(200).json({
+            ok: true, 
+            msg: 'Hospital Borrado'
+        })
+
+    } catch (error) {
+        console.log(error);
+        resp.status(400).json({
+            ok: false,
+            msg: 'no se pudo actualizar el hospital'
+        })
+    }
 }
 
 

@@ -30,12 +30,17 @@ crearHospital )
 
 // actualizacion de registros PUT
 router.put( '/:id',
-[],
+[
+    validarJWT,
+    check('nombre', 'El nombre del hospital es necesario').not().isEmpty(),
+    validarCampos
+],
 actualizarHospital )
 
 // borrar registros
 
 router.delete( '/:id',
+validarJWT,
 borrarHospital 
 );
 
